@@ -1,6 +1,6 @@
-#!bin/bash
+#!/bin/bash
 
-if ["$#" -ne 1]; then
+if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <group_names.txt>"
     exit 1
 fi
@@ -12,12 +12,15 @@ if [ ! -f "$GROUP_LIST" ]; then #Checks that the file exists, if it doesn't then
     exit 1
 fi
 
-GID_BASE=1001   #sets the starting point gor generating GIDs
+GID_BASE=1001   #sets the starting point gor generating GIDs (the first GID created will be 1001)
 LDIF_FILE="groups.ldif"  #defines the name of the LDIF file to be created
+
+#clear the LDIF file before starting
+>$LDIF_FILE
 
 while IFS= read -r group_name   #loop over each group name (-r tells read not to not treat backslashes as escape characters(?))
 do
-    if [ -z "$group_name" ] || [["$group_name" =~ ^#]]; then    #skips empty lines or lines starting with a comment
+    if [ -z "$group_name" ] || [[ "$group_name" =~ ^# ]]; then    #skips empty lines or lines starting with a comment
         continue    #if either option is true, skips to the next line, ignoring empty or commented lines
     fi
 
@@ -29,7 +32,7 @@ do
     echo "objectClass: posixGroup" >>$LDIF_FILE
     echo "cn: $group_name" >>$LDIF_FILE
     echo "gidNumber: $GID" >>$LDIF_FILE
-    echo "" >> $LDIF_FILE   #why is this here?
+    echo "" >> $LDIF_FILE
 
 done < "$GROUP_LIST"
 
