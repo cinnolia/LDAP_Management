@@ -12,7 +12,7 @@ if [ ! -f "$GROUP_LIST" ]; then #Checks that the file exists, if it doesn't then
     exit 1
 fi
 
-GID_BASE=1001   #sets the starting point gor generating GIDs (the first GID created will be 1001)
+GID_BASE=1001   #sets the starting point for generating GIDs (the first GID created will be 1001)
 LDIF_FILE="groups.ldif"  #defines the name of the LDIF file to be created
 
 #clear the LDIF file before starting
