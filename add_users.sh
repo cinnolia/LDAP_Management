@@ -25,24 +25,42 @@ if [[! -f "$INPUT_FILE"]]; then
     exit 1
 fi 
 
+#clears output file
 > "$OUTPUT_FILE"
+
 #skips the first line of the csv file and starts reading from there
 tail -n +2 "$INPUT_FILE" | while IFS=',' read -r Full Name Username Department Birthday Age Pronouns; do
 # for processing the csv file do the names of the fields in each csv row have to match whats in the actual file?
 
-#Extract First and Last Names (splits the full_name into first and last names )
-first_name=$(echo "$full_name" | awk '{print $1}' ) #extracts the first word from full_name
-last_name=$(echo "$full_name" | awk '{print $1}' ) #extracts the second word from full_name
+    #Extract First and Last Names (splits the full_name into first and last names )
+    first_name=$(echo "$full_name" | awk '{print $1}' ) #extracts the first word from full_name
+    last_name=$(echo "$full_name" | awk '{print $1}' ) #extracts the second word from full_name
 
-#determine the GID for the Department
-gid=${DEPARTMENT_TO_GID[$department]: -9999} #looks up the GID for the department or assigns the default GID 9999 if the Department isnt found
+    #determine the GID for the Department
+    id=${DEPARTMENT_TO_GID[$department]: -9999} #looks up the GID for the department or assigns the default GID 9999 if the Department isnt found
 
-#generate UID number
+    #Incriment UID number
+    
 
+    #define home directories
+    home_directory="/home/$username"
 
-#define home directories
-home_directory="/home/$username"
+    #Write LDIF Entry
+    cat <<EOF >> "$OUTPUT_FILE"
+dn: uid=&username,ou=users,dc=zoo
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: top
+cn: $full_name
+sn: $last_name
+givenName: $first_name
+uid: $username
+uidNumber: $uid_number
+gidNumber: $gid
+homeDirectory: $home_directory
+description: Birthday: $birthday, Pronouns: $pronouns
 
-#Write LDIF Entry
+EOF
+done
 
-cat <<EOf >> "$OUTPUT_FILE"
+echo "LDIF file '$OUTPUT_FILE' created successfully."
