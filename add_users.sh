@@ -5,7 +5,6 @@ INPUT_FILE= "staff directory"
 OUTPUT_FILE= "users.ldif"
 
 #Department to GID Mapping
-
 declare -A DEPARTMENT_TO_GID = (
     ["Veterinary"] = 1000
     ["Reasearch_Education"] = 1001
@@ -18,6 +17,9 @@ declare -A DEPARTMENT_TO_GID = (
     ["Security"] = 1008
     ["Volunteers"] = 1009  
 )
+
+#Initialise base UID
+base_uid= 2000
 
 #Check if the INPUT_FILE exists
 if [[! -f "$INPUT_FILE"]]; then
@@ -39,11 +41,14 @@ tail -n +2 "$INPUT_FILE" | while IFS=',' read -r Full Name Username Department B
     #determine the GID for the Department
     id=${DEPARTMENT_TO_GID[$department]: -9999} #looks up the GID for the department or assigns the default GID 9999 if the Department isnt found
 
-    #Incriment UID number
-    
+    #assign and Incriment UID number
+    uid_number=$((base_uid++))
 
     #define home directories
     home_directory="/home/$username"
+
+    #Genate temporary password (to be refined)
+    temp_password="${username}@$(echo "$birtday" | tr -d '-')"
 
     #Write LDIF Entry
     cat <<EOF >> "$OUTPUT_FILE"
@@ -58,6 +63,7 @@ uid: $username
 uidNumber: $uid_number
 gidNumber: $gid
 homeDirectory: $home_directory
+userPassword: $temp_password
 description: Birthday: $birthday, Pronouns: $pronouns
 
 EOF
