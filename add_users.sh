@@ -2,7 +2,7 @@
 
 #File Variables
 INPUT_FILE="staff_directory.csv"
-OUTPUT_FILE="users.ldif"
+OUTPUT_FILE="people.ldif"
 
 #Department to GID Mapping
 declare -A DEPARTMENT_TO_GID=(
@@ -57,7 +57,7 @@ tail -n +2 "$INPUT_FILE" | while IFS=',' read -r full_name username department b
 
     #Write LDIF Entry
     cat <<EOF >> "$OUTPUT_FILE"
-dn: uid=$username,ou=users,dc=zoo
+dn: uid=$username,ou=people,dc=zoo
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: top
